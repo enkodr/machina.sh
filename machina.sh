@@ -226,7 +226,7 @@ EOF
 hostname: ${VM_NAME}
 manage_etc_hosts: true.
 users:
-  - name: ${VM_NAME}
+  - name: ${USERNAME}
     sudo: ALL=(ALL) NOPASSWD:ALL
     groups: users, admin
     home: /home/${USERNAME}
@@ -312,6 +312,10 @@ EOF
 
 # Destroys a machine
 function destroy_machine() {
+    # Set machine name to default if not specified
+    if [ $# = 2 ]; then
+        VM_NAME=$2
+    fi
     printf "Destroying machine '${VM_NAME}'... "
     if [ -d ${VMS_DIR}/${VM_NAME} ]; then
         virsh --connect=qemu:///${SESSION_NAME} destroy ${VM_NAME} &>/dev/null
@@ -377,6 +381,7 @@ function shell_machine() {
     fi
     get_machine_ip $VM_NAME
     get_machine_username $VM_NAME
+
     ssh -i ${VMS_DIR}/${VM_NAME}/id_rsa ${USERNAME}@${IP_ADDRESS}
 }
 
@@ -406,7 +411,7 @@ function stop_machine() {
 
     printf "Stopping machine '${VM_NAME}'... "
     if [ -d ${VMS_DIR}/${VM_NAME} ]; then
-        virsh --connect=qemu:///${SESSION_NAME} shutdown ${VM_NAME} --mode initctl &>/dev/null
+        virsh --connect=qemu:///${SESSION_NAME} shutdown ${VM_NAME} &>/dev/null
         printf "Done!\n"
     else
         printf "Failed!\n"
