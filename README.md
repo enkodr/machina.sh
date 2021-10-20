@@ -29,11 +29,20 @@ Activate the `default` network interface
 virsh --connect=qemu:///system net-autostart default
 ````
 
-## Add user to `libvirt` group
+## Permissions
+
+Add user to `libvirt` group
 
 ```bash
 grep -E '^libvirt:' /usr/lib/group | sudo tee -a /etc/group
 usermod -aG libvirt username
+```
+
+Add your user and group to `/etc/libvirt/qemu.conf`
+
+```toml
+user = "me"
+group = "wheel"
 ```
 
 ## Usage
