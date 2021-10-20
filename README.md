@@ -15,12 +15,25 @@ To install the `machina` script, just clone the repo and copy the `machina` scri
 Install the dependencies
 
 ```shell
-sudo rpm-ostree install cloud-utils libvirt qemu-kvm virt-manager
+sudo rpm-ostree install cloud-utils libvirt qemu-kvm virt-manager virt-install virt-viewer #libvirt-daemon-config-network libvirt-daemon-kvm
 ```
 
 Add the user to the libvirt group
 ```shell
-usermod -a -G libvirt $USERNAME
+grep -E '^libvirt:' /usr/lib/group | sudo tee -a /etc/group
+usermod -aG libvirt $USERNAME
+```
+
+Activate the `default` network interface
+```shell
+virsh --connect=qemu:///system net-autostart default
+````
+
+## Add user to `libvirt` group
+
+```bash
+grep -E '^libvirt:' /usr/lib/group >> /etc/group
+usermod -aG libvirt username
 ```
 
 ## Usage
