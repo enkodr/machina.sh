@@ -32,7 +32,7 @@ virsh --connect=qemu:///system net-autostart default
 ## Add user to `libvirt` group
 
 ```bash
-grep -E '^libvirt:' /usr/lib/group >> /etc/group
+grep -E '^libvirt:' /usr/lib/group | sudo tee -a /etc/group
 usermod -aG libvirt username
 ```
 
