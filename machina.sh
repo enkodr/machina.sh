@@ -8,7 +8,6 @@ IMGS_DIR="$APP_DIR/images"
 VMS_DIR="$APP_DIR/vms"
 CLOUD_IMAGE="focal-server-cloudimg-amd64.img"
 SESSION_NAME="session"
-# SESSION_NAME="system"
 
 # Machine configuration
 DISTRO="ubuntu:20.04"
@@ -40,6 +39,8 @@ function show_help() {
             echo "  -n, --name <name>           Name of the machine."
             echo "                              Default: ${VM_NAME}"
             echo "  -p, --password <password>   Username to be used on the machine."
+            echo "  -s, --system                Creates the machine on the system session."
+            echo "                              Default: session"
             echo "                              Default: $USERNAME}"
             echo "  -u, --username <username>   Password to be used on the machine."
             echo "                              Default: $PASSWORD}"
@@ -283,6 +284,7 @@ EOF
 
     echo "{
     \"config\": {
+        \"connection\": \"${SESSION_NAME}\",
         \"machine\": {
             \"name\": \"${VM_NAME}\",
             \"distro\": \"${DISTRO}\",
@@ -446,12 +448,19 @@ function show_version() {
     echo "${APP_NAME}: ${APP_VERSION}"
 }
 
+function get_connection(){
+    if [ -f ${VMS_DIR}/${VM_NAME}/${APP_NAME}.json ]; then
+        SESSION_NAME=$(cat ${VMS_DIR}/${VM_NAME}/${APP_NAME}.json | jq -r '.config.connection')
+    fi
+}
+
 function main() {
     if (( $# < 1 )); then
         show_help
         return 1
     fi
 
+    get_connection
     while (( $# > 0 )); do
         case "$1" in
             (create)
