@@ -12,7 +12,7 @@ The main goal of this tool is to allow me to quickly create kvm virtual machines
 
 To install the `machina` script, just clone the repo and copy the `machina` script file into a directory on the path, such us `/usr/local/bin` or `$HOME/.local/bin`
 
-Install the dependencies
+Install the following dependencies
 
 ```shell
 sudo rpm-ostree install cloud-utils libvirt qemu-kvm virt-manager virt-install virt-viewer #libvirt-daemon-config-network libvirt-daemon-kvm
@@ -31,6 +31,7 @@ virsh --connect=qemu:///system net-autostart default
 
 ## Permissions
 
+The following permissions are needed if you want to create a machine in the `system` hypervisor.
 Add user to `libvirt` group
 
 ```bash
@@ -49,4 +50,57 @@ group = "wheel"
 
 ### Create a `machina`
 
+The following command will create a `machina` with the default settings. You can check the default settings by running `machina help create`
 
+```bash
+machina create
+```
+
+Example with specified settings:
+
+```bash
+machina create --name debian --image debian11 --disk 40 --mem 4 --cpus 2
+```
+
+### Shell into a `machina`
+
+```bash
+machina shell ubuntu
+```
+
+### Stop a running `machina`
+
+```bash
+machina stop ubuntu
+```
+
+### Start a stopped `machina`
+
+```bash
+machina start ubuntu
+```
+
+### Reboot a running `machina`
+
+```bash
+machina reboot ubuntu
+```
+
+### Get the help for a command
+
+```bash
+machina help <command_name>
+```
+
+Example:
+```bash
+machina help create
+```
+
+## TODO
+
+The following items are in my todo list:
+
+[ ] Update the cloud image(s)
+[ ] Reset everything
+[ ] Mount directories into the machines

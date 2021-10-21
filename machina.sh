@@ -128,7 +128,7 @@ function show_help() {
             echo "  start               Starts a stopped machine."
             echo "  stop                Stops running machine."
             echo "  version             Shows the application version."
-            echo "  update              Downloads the latest ubuntu cloud image."
+            # echo "  update              Downloads the latest ubuntu cloud image."
             echo ""
             exit
         ;;
