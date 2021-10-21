@@ -97,6 +97,7 @@ machina help create
 
 The following items are in my todo list:
 
+- [X] Add other distro's images
 - [ ] Update the cloud image(s)
 - [ ] Reset everything
 - [ ] Mount directories into the machines

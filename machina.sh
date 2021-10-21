@@ -9,8 +9,8 @@ VMS_DIR="$APP_DIR/vms"
 SESSION_NAME="session"
 
 # Machine configuration
-DISTRO="ubuntu:20.04"
-DISTRO_LIST=("almalinux8.4" "debian11" "fedora34" "rockylinux8.4" "ubuntu20.04")
+DISTRO="ubuntu20.04"
+DISTRO_LIST=("almalinux8.4" "centos8" "centos-stream9" "debian11" "fedora34" "rockylinux8.4" "ubuntu20.04")
 CLOUD_IMAGE="focal-server-cloudimg-amd64.img"
 OS_VARIANT="ubuntu20.04"
 VM_NAME="${APP_NAME}"
@@ -138,49 +138,59 @@ function show_help() {
 # Function that dowloads the image from the web
 function download_image() {
     mkdir -p ${IMGS_DIR}
+    printf "Downloading latest image... "
     case "${DISTRO}" in
-        (ubuntu:20.04)
-            printf "Downloading latest image... "
-            OS_VARIANT="ubuntu20.04"
-            CLOUD_IMAGE="focal-server-cloudimg-amd64.img"
-            wget -N -P ${IMGS_DIR} https://cloud-images.ubuntu.com/focal/current/${CLOUD_IMAGE} &>/dev/null
-            printf "Done!\n"
-            shift
-        ;;
-        (fedora34)
-            printf "Downloading latest image... "
-            OS_VARIANT="fedora34"
-            CLOUD_IMAGE="Fedora-Cloud-Base-34-1.2.x86_64.qcow2"
-            wget -N -P ${IMGS_DIR} https://download.fedoraproject.org/pub/fedora/linux/releases/34/Cloud/x86_64/images/${CLOUD_IMAGE} &>/dev/null
-            shift
-        ;;
         (almalinux8.4)
-            printf "Downloading latest image... "
             OS_VARIANT="centos8"
             CLOUD_IMAGE="AlmaLinux-8-GenericCloud-latest.x86_64.qcow2"
             wget -N -P ${IMGS_DIR} https://repo.almalinux.org/almalinux/8/cloud/x86_64/images/${CLOUD_IMAGE} &>/dev/null
             shift
         ;;
-        (rockylinux8.4)
+        (centos8)
             printf "Downloading latest image... "
             OS_VARIANT="centos8"
-            CLOUD_IMAGE="Rocky-8-GenericCloud-8.4-20210620.0.x86_64.qcow2"
-            wget -N -P ${IMGS_DIR} https://download.rockylinux.org/pub/rocky/8.4/images/${CLOUD_IMAGE} &>/dev/null
+            CLOUD_IMAGE="CentOS-8-GenericCloud-8.4.2105-20210603.0.x86_64.qcow2"
+            wget -N -P ${IMGS_DIR} https://cloud.centos.org/centos/8/x86_64/images/${CLOUD_IMAGE} &>/dev/null
+            shift
+        ;;
+        (centos-stream9)
+            OS_VARIANT="centos-stream9"
+            CLOUD_IMAGE="CentOS-Stream-GenericCloud-9-20211021.0.x86_64.qcow2"
+            wget -N -P ${IMGS_DIR} https://cloud.centos.org/centos/9-stream/x86_64/images/${CLOUD_IMAGE} &>/dev/null
             shift
         ;;
         (debian11)
-            printf "Downloading latest image... "
             OS_VARIANT="debian10"
             CLOUD_IMAGE="debian-11-genericcloud-amd64.qcow2"
             wget -N -P ${IMGS_DIR} https://get.debian.org/cdimage/cloud/bullseye/latest/${CLOUD_IMAGE} &>/dev/null
             shift
         ;;
+        (fedora34)
+            OS_VARIANT="fedora34"
+            CLOUD_IMAGE="Fedora-Cloud-Base-34-1.2.x86_64.qcow2"
+            wget -N -P ${IMGS_DIR} https://download.fedoraproject.org/pub/fedora/linux/releases/34/Cloud/x86_64/images/${CLOUD_IMAGE} &>/dev/null
+            shift
+        ;;
+        (rockylinux8.4)
+            OS_VARIANT="centos8"
+            CLOUD_IMAGE="Rocky-8-GenericCloud-8.4-20210620.0.x86_64.qcow2"
+            wget -N -P ${IMGS_DIR} https://download.rockylinux.org/pub/rocky/8.4/images/${CLOUD_IMAGE} &>/dev/null
+            shift
+        ;;
+        (ubuntu20.04)
+            OS_VARIANT="ubuntu20.04"
+            CLOUD_IMAGE="focal-server-cloudimg-amd64.img"
+            wget -N -P ${IMGS_DIR} https://cloud-images.ubuntu.com/focal/current/${CLOUD_IMAGE} &>/dev/null
+            shift
+        ;;
         (*)
+            printf " Failed!\n"
             echo "Image not available."
             echo "Run '${APP_NAME} image list' to get a list of available images."
             exit
         ;;
     esac
+    printf " Done!\n"
 }
 
 # Creates a new kvm machine
@@ -379,14 +389,15 @@ function image() {
 # Lists all created machines
 function list_machines() {
     echo "List of ${APP_NAME} machines"
-    printf "%-20s\t%-20s\n" "Name" "IP"
+    printf "%-20s\t%-20s\t%-20s\n" "Name" "IP" "Distro"
     # Fix for empty directory when no machines are created
     shopt -s nullglob
     for m in ${VMS_DIR}/*/; do
         local vm_info=$(cat $m/${APP_NAME}.json)
         local vm_name=$(echo $vm_info | jq -r '.config.machine.name')
         local vm_ip=$(echo $vm_info | jq -r '.config.network.ip_address')
-        printf "%-20s\t%-20s\n" $vm_name $vm_ip
+        local vm_variant=$(echo $vm_info | jq -r '.config.machine.distro')
+        printf "%-20s\t%-20s\t%-20s\n" $vm_name $vm_ip $vm_variant
     done
 }
 
