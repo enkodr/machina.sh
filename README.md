@@ -97,6 +97,6 @@ machina help create
 
 The following items are in my todo list:
 
-[ ] Update the cloud image(s)
-[ ] Reset everything
-[ ] Mount directories into the machines
+- [ ] Update the cloud image(s)
+- [ ] Reset everything
+- [ ] Mount directories into the machines
