@@ -2,7 +2,7 @@
 
 # Application configuration
 APP_NAME="machina"
-APP_VERSION="v0.1.0"
+APP_VERSION="v0.2.0"
 APP_DIR="$HOME/.machina"
 IMGS_DIR="$APP_DIR/images"
 VMS_DIR="$APP_DIR/vms"
