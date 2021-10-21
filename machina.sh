@@ -170,7 +170,7 @@ function download_image() {
         ;;
         (debian11)
             printf "Downloading latest image... "
-            OS_VARIANT="debian"
+            OS_VARIANT="debian10"
             CLOUD_IMAGE="debian-11-genericcloud-amd64.qcow2"
             wget -N -P ${IMGS_DIR} https://get.debian.org/cdimage/cloud/bullseye/latest/${CLOUD_IMAGE} &>/dev/null
             shift
