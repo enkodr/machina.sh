@@ -2,7 +2,9 @@
 
 ## Goal
 
-The installed `snaps` on Fedora Silverblue are failing to start because it doesn't support OS's where the user's home directory are not in the `/home` standard path.
+Using [snap](https://snapcraft.io/) in Fedora Silverblue is not possible at the moment.
+
+Even that is possible to install applications, those faile to start because [snap](https://snapcraft.io/) doesn't support configuration where the user's home directory are not in the `/home` standard path.
 
 One of the softwares that I really like and is only available as a `snap` is [multipass](https://github.com/canonical/multipass), an orchestrator for Ubuntu virtual machines.
 
