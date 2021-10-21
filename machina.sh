@@ -198,6 +198,14 @@ function create_machine() {
     qemu-img create -F qcow2 -b ${IMGS_DIR}/${CLOUD_IMAGE} -f qcow2 ${VMS_DIR}/${VM_NAME}/${VM_NAME}.qcow2 ${VM_DISK}G &>/dev/null 
     printf "Done!\n"
 
+    # Generate SSH key
+    printf "Generating the SSH key... "
+    ssh-keygen -R "${IP_ADDRESS}" &>/dev/null
+    ssh-keygen -t rsa -b 4096 -q -N "" -f ${VMS_DIR}/${VM_NAME}/id_rsa
+    SSH_PUB_KEY=$(cat ${VMS_DIR}/${VM_NAME}/id_rsa.pub)
+    printf "Done!\n"
+
+
     # Configures network
     printf "Configuring the machine... "
     MAC_ADDRESS=$(printf '52:54:00:%02x:%02x:%02x' $((RANDOM%256)) $((RANDOM%256)) $((RANDOM%256)))
@@ -227,6 +235,8 @@ hostname: ${VM_NAME}
 manage_etc_hosts: true.
 users:
   - name: ${USERNAME}
+    ssh_authorized_keys:
+      - ${SSH_PUB_KEY} 
     sudo: ALL=(ALL) NOPASSWD:ALL
     groups: users, admin
     home: /home/${USERNAME}
@@ -268,29 +278,7 @@ EOF
         --network network=default,model=virtio,mac=$MAC_ADDRESS \
         --noautoconsole \
         &>/dev/null 
-    printf "Done!\n"
-    printf "Waiting for the machine to be ready... "
-    ready="false"
-    while [ "$ready" = "false" ]; do
-        if nc -z $IP_ADDRESS 22; then 
-            ready="true"
-        else
-            sleep 1
-        fi
-    done
-    printf "Done!\n"
-
-    # Generate SSH key
-    printf "Generating the SSH key... "
-    ssh-keygen -R "${IP_ADDRESS}" &>/dev/null
-    ssh-keygen -t rsa -b 4096 -q -N "" -f ${VMS_DIR}/${VM_NAME}/id_rsa
-    printf "Done!\n"
-
-    printf "Copying SSH key into the machine... "
-    # TODO: Improve the functionality. This sleep was added because
-    #       although port 22 is responding, it fails on copying the key 
-    sleep 5
-    sshpass -p "${PASSWORD}" ssh-copy-id -o "StrictHostKeyChecking no" -i ${VMS_DIR}/${VM_NAME}/id_rsa.pub ${USERNAME}@${IP_ADDRESS} &>/dev/null
+        # --network bridge=virbr0,model=virtio
     printf "Done!\n"
 
     echo "{
