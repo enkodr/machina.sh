@@ -2,7 +2,7 @@
 
 # Application configuration
 APP_NAME="machina"
-APP_VERSION="v0.2.0"
+APP_VERSION="v0.3.0"
 APP_DIR="$HOME/.machina"
 IMGS_DIR="$APP_DIR/images"
 VMS_DIR="$APP_DIR/vms"
@@ -66,7 +66,7 @@ function show_help() {
             echo ""
             echo "Options:"
             echo "  list                Shows a list of available images.update"
-            echo "  download <image>    Downloads an image. If the image exists locally, will be updated."
+            # echo "  download <image>    Downloads an image. If the image exists locally, will be updated."
             echo ""
             exit
         ;;
@@ -123,6 +123,7 @@ function show_help() {
             echo "  create              Creates a new machine."
             echo "  destroy             Deletes an existing machine."
             echo "  help [action]       Shows command help."
+            echo "  image               Manage images."
             echo "  reboot              Reboots running machine."
             echo "  shell               SSH's to an existing machine."
             echo "  start               Starts a stopped machine."
@@ -389,7 +390,7 @@ function image() {
 # Lists all created machines
 function list_machines() {
     echo "List of ${APP_NAME} machines"
-    printf "%-20s\t%-20s\t%-20s\n" "Name" "IP" "Distro"
+    printf "%-20s\t%-20s\t%-20s\t%-20s\n" "Name" "IP" "Distro" "Status"
     # Fix for empty directory when no machines are created
     shopt -s nullglob
     for m in ${VMS_DIR}/*/; do
@@ -397,7 +398,11 @@ function list_machines() {
         local vm_name=$(echo $vm_info | jq -r '.config.machine.name')
         local vm_ip=$(echo $vm_info | jq -r '.config.network.ip_address')
         local vm_variant=$(echo $vm_info | jq -r '.config.machine.distro')
-        printf "%-20s\t%-20s\t%-20s\n" $vm_name $vm_ip $vm_variant
+        local status=$(virsh list --all | sed  '1,2d' | grep $vm_name | awk '{a=match($0, $3); print substr($0,a)}')
+        if [ "$status" != "running" ]; then
+            status="off"
+        fi
+        printf "%-20s\t%-20s\t%-20s\t%-20s\t%-20s\n" $vm_name $vm_ip $vm_variant $status
     done
 }
 
