@@ -7,8 +7,8 @@ APP_DIR="$HOME/.machina"
 IMGS_DIR="$APP_DIR/images"
 VMS_DIR="$APP_DIR/vms"
 CLOUD_IMAGE="focal-server-cloudimg-amd64.img"
-#SESSION_NAME="session"
-SESSION_NAME="system"
+SESSION_NAME="session"
+# SESSION_NAME="system"
 
 # Machine configuration
 DISTRO="ubuntu:20.04"
@@ -232,7 +232,7 @@ EOF
     cat >${VMS_DIR}/${VM_NAME}/user-data <<EOF
 #cloud-config
 hostname: ${VM_NAME}
-manage_etc_hosts: true.
+manage_etc_hosts: true
 users:
   - name: ${USERNAME}
     ssh_authorized_keys:
@@ -275,10 +275,10 @@ EOF
         --disk path=${VMS_DIR}/${VM_NAME}/${VM_NAME}.qcow2,device=disk \
         --disk path=${VMS_DIR}/${VM_NAME}/${VM_NAME}-seed.qcow2,device=disk \
         --import \
-        --network network=default,model=virtio,mac=$MAC_ADDRESS \
+        --network bridge=virbr0,model=virtio,mac=$MAC_ADDRESS \
         --noautoconsole \
         &>/dev/null 
-        # --network bridge=virbr0,model=virtio
+        # --network network=default,model=virtio,mac=$MAC_ADDRESS \
     printf "Done!\n"
 
     echo "{
