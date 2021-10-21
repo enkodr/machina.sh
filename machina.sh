@@ -2,7 +2,7 @@
 
 # Application configuration
 APP_NAME="machina"
-APP_VERSION="v0.3.0"
+APP_VERSION="v0.3.1"
 APP_DIR="$HOME/.machina"
 IMGS_DIR="$APP_DIR/images"
 VMS_DIR="$APP_DIR/vms"
@@ -390,7 +390,7 @@ function image() {
 # Lists all created machines
 function list_machines() {
     echo "List of ${APP_NAME} machines"
-    printf "%-20s\t%-20s\t%-20s\t%-20s\n" "Name" "IP" "Distro" "Status"
+    printf "%-20s\t%-20s\t%-20s\t%-20s\n" "Name" "IP" "Status" "Distro"
     # Fix for empty directory when no machines are created
     shopt -s nullglob
     for m in ${VMS_DIR}/*/; do
@@ -402,7 +402,7 @@ function list_machines() {
         if [ "$status" != "running" ]; then
             status="off"
         fi
-        printf "%-20s\t%-20s\t%-20s\t%-20s\t%-20s\n" $vm_name $vm_ip $vm_variant $status
+        printf "%-20s\t%-20s\t%-20s\t%-20s\t%-20s\n" $vm_name $vm_ip $status $vm_variant
     done
 }
 
