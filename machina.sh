@@ -6,16 +6,17 @@ APP_VERSION="v0.1.0"
 APP_DIR="$HOME/.machina"
 IMGS_DIR="$APP_DIR/images"
 VMS_DIR="$APP_DIR/vms"
-CLOUD_IMAGE="focal-server-cloudimg-amd64.img"
 SESSION_NAME="session"
 
 # Machine configuration
 DISTRO="ubuntu:20.04"
-DISTRO_LIST=("ubuntu:20.04" "fedora:34")
+DISTRO_LIST=("almalinux8.4" "debian11" "fedora34" "rockylinux8.4" "ubuntu20.04")
+CLOUD_IMAGE="focal-server-cloudimg-amd64.img"
+OS_VARIANT="ubuntu20.04"
 VM_NAME="${APP_NAME}"
-VM_RAM="1"
+VM_RAM="2"
 VM_CPUS="1"
-VM_DISK="10"
+VM_DISK="20"
 USERNAME="$APP_NAME"
 PASSWORD="$APP_NAME"
 
@@ -29,13 +30,13 @@ function show_help() {
             echo ""
             echo "Options:"
             echo "  -c, --cpus <cpus>           Number of CPU's to allocate."
-            echo "                              Default: 1"
+            echo "                              Default: ${VM_CPUS}"
             echo "  -d, --disk <disk>           Disk space to allocate. Positive integer, in GB."
-            echo "                              Default: 10"
+            echo "                              Default: ${VM_DISK}"
             echo "  -i, --image <image>         Set's the image to use. Run '${APP_NAME} image list' for a list of available images"
-            echo "                              Default: ubuntu:20.04"
+            echo "                              Default: ubuntu20.04"
             echo "  -n, --mem <mem>             Amount of memory to allocate. Positive integer, in GB."
-            echo "                              Default: 1"
+            echo "                              Default: ${VM_RAM}"
             echo "  -n, --name <name>           Name of the machine."
             echo "                              Default: ${VM_NAME}"
             echo "  -p, --password <password>   Username to be used on the machine."
@@ -140,18 +141,44 @@ function download_image() {
     case "${DISTRO}" in
         (ubuntu:20.04)
             printf "Downloading latest image... "
+            OS_VARIANT="ubuntu20.04"
+            CLOUD_IMAGE="focal-server-cloudimg-amd64.img"
             wget -N -P ${IMGS_DIR} https://cloud-images.ubuntu.com/focal/current/${CLOUD_IMAGE} &>/dev/null
             printf "Done!\n"
             shift
         ;;
-        (fedora)
-            echo "Not yet implemented"
+        (fedora34)
+            printf "Downloading latest image... "
+            OS_VARIANT="fedora34"
+            CLOUD_IMAGE="Fedora-Cloud-Base-34-1.2.x86_64.qcow2"
+            wget -N -P ${IMGS_DIR} https://download.fedoraproject.org/pub/fedora/linux/releases/34/Cloud/x86_64/images/${CLOUD_IMAGE} &>/dev/null
+            shift
+        ;;
+        (almalinux8.4)
+            printf "Downloading latest image... "
+            OS_VARIANT="centos8"
+            CLOUD_IMAGE="AlmaLinux-8-GenericCloud-latest.x86_64.qcow2"
+            wget -N -P ${IMGS_DIR} https://repo.almalinux.org/almalinux/8/cloud/x86_64/images/${CLOUD_IMAGE} &>/dev/null
+            shift
+        ;;
+        (rockylinux8.4)
+            printf "Downloading latest image... "
+            OS_VARIANT="centos8"
+            CLOUD_IMAGE="Rocky-8-GenericCloud-8.4-20210620.0.x86_64.qcow2"
+            wget -N -P ${IMGS_DIR} https://download.rockylinux.org/pub/rocky/8.4/images/${CLOUD_IMAGE} &>/dev/null
+            shift
+        ;;
+        (debian11)
+            printf "Downloading latest image... "
+            OS_VARIANT="debian"
+            CLOUD_IMAGE="debian-11-genericcloud-amd64.qcow2"
+            wget -N -P ${IMGS_DIR} https://get.debian.org/cdimage/cloud/bullseye/latest/${CLOUD_IMAGE} &>/dev/null
             shift
         ;;
         (*)
             echo "Image not available."
             echo "Run '${APP_NAME} image list' to get a list of available images."
-            shift
+            exit
         ;;
     esac
 }
@@ -272,7 +299,7 @@ EOF
         --ram ${MEM} \
         --vcpus=${VM_CPUS} \
         --os-type linux \
-        --os-variant ubuntu20.04 \
+        --os-variant ${OS_VARIANT} \
         --disk path=${VMS_DIR}/${VM_NAME}/${VM_NAME}.qcow2,device=disk \
         --disk path=${VMS_DIR}/${VM_NAME}/${VM_NAME}-seed.qcow2,device=disk \
         --import \
