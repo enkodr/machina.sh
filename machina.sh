@@ -1,7 +1,7 @@
 #!/bin/bash
 
 # Application configuration
-APP_NAME="machina"
+APP_NAME="machina.sh"
 APP_VERSION="v0.3.1"
 APP_DIR="$HOME/.machina"
 IMGS_DIR="$APP_DIR/images"
@@ -196,6 +196,13 @@ function download_image() {
 
 # Creates a new kvm machine
 function create_machine() {
+    # Check if image already exists
+
+    if [ -d ${VMS_DIR}/${VM_NAME} ]; then
+        echo "Machine '${VM_NAME}' already exists."
+        exit
+    fi
+
     # Check passed values
     while (( $# > 0 )); do
         case "$1" in 
