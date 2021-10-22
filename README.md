@@ -30,14 +30,14 @@ sudo rpm-ostree install cloud-utils libvirt qemu-kvm virt-manager virt-install v
 
 The following permissions should **only** be needed if you want to create a machine in the `system` hypervisor.
 
-### Add user to `libvirt` group
+#### Add user to `libvirt` group
 
 ```bash
 grep -E '^libvirt:' /usr/lib/group | sudo tee -a /etc/group
 usermod -aG libvirt username
 ```
 
-### Add your user and group to `/etc/libvirt/qemu.conf`
+#### Add your user and group to `/etc/libvirt/qemu.conf`
 
 ```toml
 user = "me"
