@@ -18,7 +18,7 @@ To install the `machina` script, just clone the repo and copy the `machina` scri
 curl -s https://raw.githubusercontent.com/enkodr/machina.sh/main/machina.sh -o $HOME/.local/bin/machina.sh
 ```
 
-## Dependencies 
+### Dependencies 
 
 Install the following dependencies
 
@@ -26,9 +26,9 @@ Install the following dependencies
 sudo rpm-ostree install cloud-utils libvirt qemu-kvm virt-manager virt-install virt-viewer #libvirt-daemon-config-network libvirt-daemon-kvm
 ```
 
-## Permissions
+### Permissions (optional)
 
-The following permissions are needed if you want to create a machine in the `system` hypervisor.
+The following permissions should **only** be needed if you want to create a machine in the `system` hypervisor.
 
 ### Add user to `libvirt` group
 
