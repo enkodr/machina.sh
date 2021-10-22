@@ -1,7 +1,7 @@
 #!/bin/bash
 
 # Application configuration
-APP_NAME="machina.sh"
+APP_NAME="machina"
 APP_VERSION="v0.3.1"
 APP_DIR="$HOME/.machina"
 IMGS_DIR="$APP_DIR/images"
