@@ -244,6 +244,11 @@ function create_machine() {
     qemu-img create -F qcow2 -b ${IMGS_DIR}/${CLOUD_IMAGE} -f qcow2 ${VMS_DIR}/${VM_NAME}/${VM_NAME}.qcow2 ${VM_DISK}G &>/dev/null 
     printf "Done!\n"
 
+    # Configuring network
+    MAC_ADDRESS=$(printf '52:54:00:%02x:%02x:%02x' $((RANDOM%256)) $((RANDOM%256)) $((RANDOM%256)))
+    INTERFACE=eth01
+    IP_ADDRESS=$(printf '192.168.122.%2d' $((RANDOM%244 + 10)))
+
     # Generate SSH key
     printf "Generating the SSH key... "
     ssh-keygen -R "${IP_ADDRESS}" &>/dev/null
@@ -251,12 +256,8 @@ function create_machine() {
     SSH_PUB_KEY=$(cat ${VMS_DIR}/${VM_NAME}/id_rsa.pub)
     printf "Done!\n"
 
-
     # Configures network
     printf "Configuring the machine... "
-    MAC_ADDRESS=$(printf '52:54:00:%02x:%02x:%02x' $((RANDOM%256)) $((RANDOM%256)) $((RANDOM%256)))
-    INTERFACE=eth01
-    IP_ADDRESS=$(printf '192.168.122.%2d' $((RANDOM%254)))
     cat >${VMS_DIR}/${VM_NAME}/network-config <<EOF
 ethernets:
     $INTERFACE:
@@ -355,6 +356,8 @@ function destroy_machine() {
     if [ -d ${VMS_DIR}/${VM_NAME} ]; then
         virsh --connect=qemu:///${SESSION_NAME} destroy ${VM_NAME} &>/dev/null
         virsh --connect=qemu:///${SESSION_NAME} undefine ${VM_NAME} &>/dev/null
+        get_machine_ip $VM_NAME
+        ssh-keygen -R "${IP_ADDRESS}" &>/dev/null
         rm -rf ${VMS_DIR}/${VM_NAME} 
         printf "Done!\n"
     else
@@ -422,7 +425,7 @@ function shell_machine() {
     get_machine_ip $VM_NAME
     get_machine_username $VM_NAME
 
-    ssh -i ${VMS_DIR}/${VM_NAME}/id_rsa ${USERNAME}@${IP_ADDRESS}
+    ssh -o StrictHostKeyChecking=no -i ${VMS_DIR}/${VM_NAME}/id_rsa ${USERNAME}@${IP_ADDRESS}
 }
 
 # Start the machine
