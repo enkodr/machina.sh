@@ -346,6 +346,22 @@ EOF
     
 }
 
+# Creates a share into the machine
+function create_share() {
+    # Set machine name to default if not specified
+    if [ $# = 2 ]; then
+        VM_NAME=$2
+    fi
+    get_machine_ip $VM_NAME
+    get_machine_username $VM_NAME
+    if ! [ -x "$(command -v sshfs)" ]; then
+        echo "Install sshfs"
+        exit
+    else
+        sshfs -o IdentityFile=/home/sa/.machina/vms/${VM_NAME}/id_rsa ${USERNAME}@${IP_ADDRESS}:/home/machina/share /home/sa/.machina/share/
+    fi
+}
+
 # Destroys a machine
 function destroy_machine() {
     # Set machine name to default if not specified
@@ -538,6 +554,10 @@ function main() {
             ;;
             (reboot)
                 reboot_machine "$@"
+                exit
+            ;;
+            (share)
+                create_share "$@"
                 exit
             ;;
             (shell)
